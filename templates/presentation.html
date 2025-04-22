@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Code Snippet Presentation</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/5.0.2/reveal.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/5.0.2/theme/white.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fira+Code&display=swap">
+    <style>
+        .reveal .code-snippet-ui {
+            width: 1600px;
+            height: 900px;
+            background: #F5F5F5;
+            margin: 0 auto;
+            display: flex;
+            flex-direction: column;
+        }
+        .reveal .header {
+            height: 200px;
+            background: #F5F5F5;
+        }
+        .reveal .code-area {
+            flex: 1;
+            padding: 20px;
+            background: white;
+            overflow: hidden;
+        }
+        .reveal pre {
+            margin: 0;
+            padding: 0;
+            background: none !important;
+            box-shadow: none !important;
+        }
+        .code-with-lines {
+            display: grid;
+            grid-template-columns: 100px 1fr;
+            font-family: 'Fira Code', monospace;
+        }
+        .line-number {
+            color: #666666;
+            text-align: right;
+            padding-right: 10px;
+            border-right: 2px solid black;
+            margin-right: 10px;
+            user-select: none;
+        }
+        .code-line {
+            white-space: pre;
+            text-align: left;
+            opacity: 0;
+            transition: opacity 0.2s;
+        }
+        .code-line.visible {
+            opacity: 1;
+        }
+        /* Language specific token styles */
+        .token.keyword { color: #7c4dff; } /* purple */
+        .token.function { color: #0066cc; } /* blue */
+        .token.string { color: #2e7d32; } /* green */
+        .token.number { color: #d32f2f; } /* red */
+        .token.comment { color: #9e9e9e; font-style: italic; } /* grey italic */
+        .token.operator { color: #546e7a; } /* blue-grey */
+        
+        .reveal {
+            font-size: 24px;
+        }
+        .reveal .slides {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 1080px !important;
+        }
+    </style>
+</head>
+<body>
+    <div class="reveal">
+        <div class="slides">
+            {% for snippet in snippets %}
+            <section>
+                <div class="code-snippet-ui">
+                    <div class="header"></div>
+                    <div class="code-area">
+                        <div class="code-with-lines" style="font-size: {{ snippet.font_size }}px; line-height: {{ snippet.font_size * 1.5 }}px;">
+                            {% for line_num, code_line in snippet.line_pairs %}
+                            <div class="line-number">{{ line_num }}</div>
+                            <div class="code-line language-{{ snippet.language }}" data-line="{{ loop.index }}">{{ code_line }}</div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+            </section>
+            {% endfor %}
+        </div>
+    </div>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/5.0.2/reveal.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-python.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-java.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-cpp.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-go.min.js"></script>
+    <script>
+        Reveal.initialize({
+            width: 1920,
+            height: 1080,
+            margin: 0.1,
+            hash: true,
+            transition: 'none'
+        });
+        
+        // Apply Prism.js highlighting to each code line
+        document.addEventListener('DOMContentLoaded', function() {
+            document.querySelectorAll('.code-line').forEach(function(element) {
+                Prism.highlightElement(element);
+            });
+        });
+        
+        // Typewriter effect
+        Reveal.addEventListener('slidechanged', function(event) {
+            const slide = event.currentSlide;
+            const lines = slide.querySelectorAll('.code-line');
+            lines.forEach(line => line.classList.remove('visible'));
+            let index = 0;
+            function typeLine() {
+                if (index < lines.length) {
+                    lines[index].classList.add('visible');
+                    index++;
+                    setTimeout(typeLine, 500); // 500ms delay per line
+                }
+            }
+            setTimeout(typeLine, 500); // Start after 500ms
+        });
+    </script>
+</body>
+</html>
